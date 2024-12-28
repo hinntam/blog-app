@@ -18,7 +18,7 @@ export default function Home() {
           <div className="relative flex justify-center items-center">
             {/* Image */}
             <Image
-              src="/image-desktop.png"
+              src="/image-desktop.jpg"
               width={1000}
               height={760}
               className="hidden md:block z-10"
