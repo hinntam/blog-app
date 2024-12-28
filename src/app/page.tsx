@@ -18,10 +18,10 @@ export default function Home() {
           <div className="relative flex justify-center items-center">
             {/* Image */}
             <Image
-              src="/image-desktop.jpg"
+              src="/image-desktop.jpeg"
               width={1000}
               height={760}
-              className="hidden md:block z-10"
+              className="hidden md:block z-10 rounded-lg"
               alt="Screenshots of the dashboard project showing desktop version"
             />
           </div>
