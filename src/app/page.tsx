@@ -7,11 +7,11 @@ export default function Home() {
       <div className="container mx-auto p-4 relative">
         <div className="bg-white border-2 border-purple-100 rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex flex-col justify-center">
-            <h1 className={`text-4xlfont-bold mb-4 ${styles.text_wisteria}`}>Welcome</h1>
+            <h1 className={`text-4xlfont-bold mb-4 ${styles.text_wisteria}`}>Welcome to AskCalgary</h1>
             <p className="text-lg text-gray-700 mb-4">
-              Massa urna magnis dignissim id euismod porttitor vitae etiam viverra nunc at adipiscing sit morbi aliquet mauris porttitor nisi, senectus pharetra, ac porttitor orci.
+            AskCalgary is a vibrant community platform dedicated to connecting residents, newcomers, and visitors in Calgary, Alberta.
             </p>
-            <a href="/blog/posts" className={`outline outline-1 outline-offset-2 border-purple-700 text-purple-700 hover:text-white py-2 px-4 rounded hover:bg-purple-800 md:w-auto ${styles.fit_content}`}>
+            <a href="/blog/authentication" className={`outline outline-1 outline-offset-2 border-purple-700 text-purple-700 hover:text-white py-2 px-4 rounded hover:bg-purple-800 md:w-auto ${styles.fit_content}`}>
               Go to Blog
             </a>
           </div>

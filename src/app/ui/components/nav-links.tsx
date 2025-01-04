@@ -1,8 +1,6 @@
 'use client'
 import {
-  UserGroupIcon,
   HomeIcon,
-  DocumentDuplicateIcon,
   EnvelopeIcon
 } from '@heroicons/react/24/outline';
 
@@ -14,13 +12,8 @@ import clsx from 'clsx';
 
 const links = [
   { name: 'Home', href: '/', icon: HomeIcon },
-  {
-    name: 'Posts',
-    href: '/blog/posts',
-    icon: DocumentDuplicateIcon,
-  },
-  { name: 'About', href: '/blog/about', icon: UserGroupIcon },
-  { name: 'Contact', href: '/blog/contact', icon: EnvelopeIcon },
+  
+  { name: 'Posts', href: '/blog/insert', icon: EnvelopeIcon },
 ];
 
 export default function NavLinks() {

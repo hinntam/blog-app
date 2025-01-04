@@ -21,3 +21,12 @@ export async function getPosts(){
         console.error('Error getting posts', error);
     }
 }
+export async function insertPost(title:string,content:string,author:string){
+    try {
+        const data = await sql`INSERT INTO posts (title,content,author) VALUES (${title},${content},${author}) RETURNING *`;
+        console.log(data.rows);
+        return data.rows;
+    } catch (error) {
+        console.error('Error inserting post', error);
+    }
+}
