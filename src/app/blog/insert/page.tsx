@@ -10,8 +10,8 @@ export default function InsertPost() {
   const [author, setAuthor] = useState('');
   const [createdDate, setCreatedDate] = useState('');
 
-  const PROMPT = "You are a creative blog writer. write a 50-word blog post about the title below. You can write anything you want, but it must be at least 50 words long. The title is: "
-  const [generating, setGenerating] = useState(false);
+  //const PROMPT = "You are a creative blog writer. write a 50-word blog post about the title below. You can write anything you want, but it must be at least 50 words long. The title is: "
+
   const [alertVisible, setAlertVisible] = useState(false);
   interface Post {
     id: string;
@@ -24,29 +24,7 @@ export default function InsertPost() {
   const [posts, setPosts] = useState<Post[]>([]);
   const[addedPost,setAddedPost] = useState(false);
   const[updated,setUpdated] = useState(false);
-  const generateContent = () => {
-    setGenerating(true);
-    if (!title) { return false }
-    const requestParams = {
-      model: "gpt-3.5-turbo",
-      messages: [{ "role": "system", "content": PROMPT + title },
-      { "role": "user", "content": title },]
-
-    }
-    fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-      },
-      body: JSON.stringify(requestParams)
-    }).then(res => res.json())
-      .then(data => {
-        //setDescription(data.choices[0].message.content);
-        console.log(data);
-        setGenerating(false);
-      }).catch(console.error)
-  }
+  
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,6 +48,9 @@ export default function InsertPost() {
         setAlertVisible(true);
         // Hide alert after 3 seconds
         setTimeout(() => setAlertVisible(false), 3000);
+
+        setAddedPost(false);
+
         fetchPosts();
         
       }).catch(console.error)
@@ -93,6 +74,7 @@ export default function InsertPost() {
         // Hide alert after 3 seconds
         setTimeout(() => setAlertVisible(false), 3000);
         fetchPosts();
+        setAddedPost(false);
       }).catch(console.error)
     }
 
@@ -130,7 +112,7 @@ export default function InsertPost() {
 
   };
   useEffect(()=>{
-    console.log(process.env.OPENAI_API_KEY );
+    //console.log(process.env.API_URL );
     fetchPosts();
 
   },[])
@@ -138,21 +120,19 @@ export default function InsertPost() {
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="font-bold text-purple-800 text-2xl">Posts</h1>
-        <button className="bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" 
-        onClick={()=>setAddedPost(!addedPost)}>
+        <button onClick={()=>setAddedPost(!addedPost)} className="bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
           <PlusIcon className="h-5 w-5 inline-block mr-2" />
-          Add New Post
+          Add new Post
         </button>
       </div>
       {alertVisible && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-          <strong className="font-bold">Success!</strong>
-          <span className="block sm:inline"> {messages}</span>
+          <strong className="font-bold">{messages}</strong>
+          
         </div>
       )}
-      
-      {
-        addedPost? (<form onSubmit={handleSubmit} className="bg-white border-2 border-purple-100 rounded-lg p-6">
+      {addedPost? 
+        <form onSubmit={handleSubmit} className="bg-white border-2 border-purple-100 rounded-lg p-6 mb-4">
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
               Title
@@ -174,17 +154,9 @@ export default function InsertPost() {
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="shadow appearance-none border rounded w-full h-40 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
-            {generating && <p className="text-gray-500 text-sm">Generating content...</p>}
-            <button
-              type="button"
-              onClick={()=> generateContent()}
-              className="bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              Generated content
-            </button>
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="author">
@@ -217,39 +189,36 @@ export default function InsertPost() {
               type="submit"
               className="bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
-              Submit
+             Submit
             </button>
           </div>
-        </form>):<div className="bg-white border-2 border-purple-100 rounded-lg p-6">
-        <h2 className="font-bold text-purple-800 text-xl mb-4">Post List</h2>
-        <ul>
-          {Array.isArray(posts) && posts.map((post) => (
-            <li key={post.id} className="mb-4 border-b border-gray-200 pb-4">
-              <div className="flex ">
-                <div className="grow ">
-                  <h3 className="font-bold text-lg">{post.title}</h3>
-                  <p className="text-gray-700">{post.content}</p>
-                  <p className="text-gray-500 text-sm">By {post.author} on {post.date}</p>
-                </div>
-                <div className="flex-none w-1/4 space-x-2 pt-5">
-                  <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  onClick={() => handleEdit(post)}
-                  >
-                    <PencilIcon className="h-5 w-5 inline-block mr-2" />
-                    Edit
-                  </button>
-                  <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    onClick={() => handleDelete(post.id)}>
-                    <TrashIcon className="h-5 w-5 inline-block mr-2" />
-                    Delete
-                  </button>
-                </div>
+        </form>
+      :<div className="bg-white border-2 border-purple-100 rounded-lg p-6">
+      <h2 className="font-bold text-purple-800 text-xl mb-4">Post List</h2>
+      <ul>
+        {Array.isArray(posts) && posts.map((post) => (
+          <li key={post.id} className="mb-4 border-b border-gray-200 pb-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+              <div className="flex-grow w-full md:w-7/10 mb-4 md:mb-0">
+                <h3 className="font-bold text-lg">{post.title}</h3>
+                <p className="text-gray-700">{post.content}</p>
+                <p className="text-gray-500 text-sm">By {post.author} on {post.date}</p>
               </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-      }
+              <div className="flex space-x-2 w-full md:w-auto">
+                <button onClick={() => handleEdit(post)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                  <PencilIcon className="h-5 w-5 inline-block mr-2" />
+                  Edit
+                </button>
+                <button onClick={() => handleDelete(post.id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                  <TrashIcon className="h-5 w-5 inline-block mr-2" />
+                  Delete
+                </button>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>}
       
     </div>
   );

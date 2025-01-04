@@ -32,7 +32,7 @@ export default function NavLinks() {
               pathname === link.href ? 'bg-purple-100' : ''
             )}
             >
-            <p className="hidden md:block">{link.name}</p>
+            <p className="text-black md:text-black font-bold">{link.name}</p>
           </Link>
         );
       })}

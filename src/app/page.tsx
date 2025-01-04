@@ -24,6 +24,13 @@ export default function Home() {
               className="hidden md:block z-10 rounded-lg"
               alt="Screenshots of the dashboard project showing desktop version"
             />
+            <Image
+              src="/image-mobile.jpeg"
+              width={560}
+              height={620}
+              className="block rounded-md md:hidden"
+              alt="Screenshot of the dashboard project showing mobile version"
+            />
           </div>
         </div>
       </div>
