@@ -183,7 +183,7 @@ export default function InsertPost() {
               onClick={()=> generateContent()}
               className="bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
-              Generate content
+              Generated content
             </button>
           </div>
           <div className="mb-4">
