@@ -1,6 +1,9 @@
 "use client"
-import { useState,useEffect } from 'react';
+import { useState,useEffect,useRef, useMemo } from 'react';
 import { PencilIcon, PlusIcon,TrashIcon } from '@heroicons/react/24/outline';
+import dynamic from 'next/dynamic';
+
+const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 
 export default function InsertPost() {
   const [id, setID] = useState('');
@@ -24,8 +27,25 @@ export default function InsertPost() {
   const [posts, setPosts] = useState<Post[]>([]);
   const[addedPost,setAddedPost] = useState(false);
   const[updated,setUpdated] = useState(false);
-  
+  const editor = useRef(null); //declared a null value 
 
+  
+    /* The most important point*/
+  const config = useMemo( //  Using of useMemo while make custom configuration is strictly recomended 
+      () => ({              //  if you don't use it the editor will lose focus every time when you make any change to the editor, even an addition of one character
+        /* Custom image uploader button configuretion to accept image and convert it to base64 format */
+        uploader: {         
+          insertImageAsBase64URI: true,
+          imagesExtensions: ['jpg', 'png', 'jpeg', 'gif', 'svg', 'webp'] // this line is not much important , use if you only strictly want to allow some specific image format
+        },
+      }),
+      []
+    );
+    /* function to handle the changes in the editor */
+    const handleChange = (value: string) => {
+      //setContent(value);
+      setDescription(value);
+    };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission logic here
@@ -150,14 +170,20 @@ export default function InsertPost() {
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
               Description
             </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="shadow appearance-none border rounded w-full h-60
-               py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
+            <div className="h-full">
+              {/* This is the main initialization of the Jodit editor */}
+                <JoditEditor 
+                  ref={editor}            //This is important
+                  value={description}         //This is important
+                  config={config}         //Only use when you declare some custom configs
+                  onChange={handleChange} //handle the changes
+                  className="w-full h-[70%] mt-10 bg-white"
+                  />
+                  <style>
+                    {`.jodit-wysiwyg{height:300px !important}`}
+                  </style>
+              </div>
+           
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="author">
@@ -202,7 +228,7 @@ export default function InsertPost() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
               <div className="flex-grow w-full md:w-7/10 mb-4 md:mb-0">
                 <h3 className="font-bold text-lg">{post.title}</h3>
-                <p className="text-gray-700">{post.content}</p>
+                <div dangerouslySetInnerHTML={{ __html: post.content }}></div>
                 <p className="text-gray-500 text-sm">By {post.author} on {post.date}</p>
               </div>
               <div className="flex space-x-2 w-full md:w-auto">
