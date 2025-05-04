@@ -1,6 +1,6 @@
 const Button = () => {
     const handleClick = () => {
-      const url = "http://localhost:3000/login";
+      const url = "https://askcalgary.vercel.app/login/";
       window.open(url, "_blank");
     }
     return (
