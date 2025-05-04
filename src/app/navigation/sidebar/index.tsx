@@ -33,17 +33,17 @@ const Sidebar = ({
 
         <ul className="sidebar-nav text-center leading-relaxed text-xl">
           <li>
-            <Link href="/about" onClick={toggle}>
+            <Link href="https://hinntam.vercel.app/" onClick={toggle}>
               <p>About Us</p>
             </Link>
           </li>
           <li>
-            <Link href="/services" onClick={toggle}>
+            <Link href="https://askcalgary.vercel.app/blog/about" onClick={toggle}>
               <p>Services</p>
             </Link>
           </li>
           <li>
-            <Link href="/contacts" onClick={toggle}>
+            <Link href="https://askcalgary.vercel.app/login" onClick={toggle}>
               <p>Contacts</p>
             </Link>
           </li>
