@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 export default function RecentPosts() {
   return (
     <div className="bg-[#0F172A] text-white min-h-screen p-6 md:p-10">
@@ -12,6 +13,7 @@ export default function RecentPosts() {
 
           {/* Post Item 1 */}
           <div className="flex flex-col md:flex-row bg-[#1E293B] rounded-xl overflow-hidden">
+          <Link href="/detail/" className="flex flex-col md:flex-row bg-[#1E293B] rounded-xl overflow-hidden">
           <Image
                             src="/logo.svg"
                             width={200}
@@ -29,10 +31,13 @@ export default function RecentPosts() {
                 <span className="ml-auto">7 mins read</span>
               </div>
             </div>
+          </Link>
           </div>
 
           {/* Post Item 2 */}
           <div className="flex flex-col md:flex-row bg-[#1E293B] rounded-xl overflow-hidden">
+            <Link href="/detail/" className="flex flex-col md:flex-row bg-[#1E293B] rounded-xl overflow-hidden">
+          
              <Image
                             src="/logo.svg"
                             width={200}
@@ -50,6 +55,7 @@ export default function RecentPosts() {
                 <span className="ml-auto">12 mins read</span>
               </div>
             </div>
+            </Link>
           </div>
         </div>
 
