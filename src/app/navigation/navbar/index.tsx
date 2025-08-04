@@ -30,10 +30,10 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
       href: "/blog",
       icon: "📖",
       dropdown: [
-        { name: "All Posts", href: "/blog/posts", description: "Browse all stories" },
+        { name: "All Posts", href: "/blog/all-posts", description: "Browse all stories" },
+        { name: "Latest Posts", href: "/blog/posts", description: "Recent updates" },
         { name: "Categories", href: "/blog/categories", description: "Explore by topic" },
-        { name: "Popular", href: "/blog/popular", description: "Most read stories" },
-        { name: "Recent", href: "/blog/recent", description: "Latest updates" }
+        { name: "Popular", href: "/blog/popular", description: "Most read stories" }
       ]
     },
     {

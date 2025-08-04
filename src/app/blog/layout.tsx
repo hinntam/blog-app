@@ -1,4 +1,3 @@
-import SideNav from "@/app/ui/components/sidenav";
 import { AuthContextProvider } from "../_utils/auth-context";
 export default function Layout({
     children,
@@ -10,9 +9,9 @@ export default function Layout({
       <AuthContextProvider>
         
         <div className="flex h-screen flex-col md:flex-row md:overflow-hidden bg-white">
-          <div className="w-full flex-none md:w-64">
+          {/* <div className="w-full flex-none md:w-64">
             <SideNav />
-          </div>
+          </div> */}
           <div className="flex-grow p-6 md:overflow-y-auto md:p-12">{children}</div>
         </div>
       </AuthContextProvider>
