@@ -1,60 +1,145 @@
 
-import { sql } from '@vercel/postgres';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { query, initializeDatabase } from '@/app/lib/database';
 
-export async function GET() {
+// Initialize database on first load
+let dbInitialized = false;
+
+async function ensureDbInitialized() {
+  if (!dbInitialized) {
+    await initializeDatabase();
+    dbInitialized = true;
+  }
+}
+
+export async function GET(request: NextRequest) {
   try {
-    const posts = await sql`SELECT * FROM posts`;
+    await ensureDbInitialized();
     
-    return NextResponse.json({ posts }, { status: 200 });
-  } catch (error) {
-    return NextResponse.json({ error }, { status: 500 });
-  }
-}
-
-export async function POST(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const title = searchParams.get('title');
-  const content = searchParams.get('content');
-  const date = searchParams.get('date');
-  const author = searchParams.get('author');
-
-
-  try {
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '6');
+    const category = searchParams.get('category');
+    const search = searchParams.get('search');
     
-    // SQL query to insert a new post
-    await sql`INSERT INTO posts (author, title, content, date) VALUES (${author}, ${title}, ${content}, ${date});`;
-    return NextResponse.json({ message: 'Post successfully inserted' }, { status: 200 });
+    const offset = (page - 1) * limit;
+
+    // Build the WHERE clause based on filters
+    let whereClause = "WHERE p.status = 'published'";
+    const queryParams: unknown[] = [limit, offset];
+    let paramIndex = 2;
+
+    if (category && category !== 'all') {
+      paramIndex++;
+      whereClause += ` AND p.category = $${paramIndex}`;
+      queryParams.push(category);
+    }
+
+    if (search) {
+      paramIndex++;
+      whereClause += ` AND (p.title ILIKE $${paramIndex} OR p.content ILIKE $${paramIndex} OR p.excerpt ILIKE $${paramIndex})`;
+      queryParams.push(`%${search}%`);
+    }
+
+    // Get posts with pagination
+    const postsQuery = `
+      SELECT 
+        p.id,
+        p.title,
+        p.excerpt,
+        p.image_url,
+        p.category,
+        p.tags,
+        p.featured,
+        p.views,
+        p.created_at,
+        u.username as author_name
+      FROM posts p
+      LEFT JOIN user_blog u ON p.author_id = u.user_id
+      ${whereClause}
+      ORDER BY p.featured DESC, p.created_at DESC
+      LIMIT $1 OFFSET $2
+    `;
+
+    const posts = await query(postsQuery, queryParams);
+
+    // Get total count for pagination
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM posts p
+      ${whereClause.replace('LIMIT $1 OFFSET $2', '')}
+    `;
+    
+    const countParams = queryParams.slice(2); // Remove limit and offset
+    const countResult = await query(countQuery, countParams);
+    const totalPosts = parseInt(countResult.rows[0].total);
+    const totalPages = Math.ceil(totalPosts / limit);
+
+    // Get categories for filter
+    const categoriesResult = await query(`
+      SELECT DISTINCT category, COUNT(*) as count
+      FROM posts 
+      WHERE status = 'published'
+      GROUP BY category
+      ORDER BY count DESC
+    `);
+
+    return NextResponse.json({
+      success: true,
+      posts: posts.rows,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalPosts,
+        hasMore: page < totalPages,
+        limit
+      },
+      categories: categoriesResult.rows
+    });
+
   } catch (error) {
-    return NextResponse.json({ error }, { status: 500 });
+    console.error('Get posts error:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch posts from database' },
+      { status: 500 }
+    );
   }
 }
-export async function DELETE(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
 
+export async function POST(request: NextRequest) {
   try {
-    // SQL query to delete a post
-    await sql`DELETE FROM posts WHERE id = ${id};`;
-    return NextResponse.json({ message: 'Post successfully deleted' }, { status: 200 });
-  } catch (error) {
-    return NextResponse.json({ error }, { status: 500 });
-  }
-}
-export async function PUT(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
-  const title = searchParams.get('title');
-  const content = searchParams.get('content');
-  const date = searchParams.get('date');
-  const author = searchParams.get('author');
+    await ensureDbInitialized();
+    
+    const body = await request.json();
+    const { title, content, excerpt, imageUrl, authorId, category, tags, featured } = body;
 
-  try {
-    // SQL query to update a post
-    await sql`UPDATE posts SET title = ${title}, content = ${content}, date = ${date}, author = ${author} WHERE id = ${id};`;
-    return NextResponse.json({ message: 'Post successfully updated' }, { status: 200 });
+    if (!title || !content || !authorId) {
+      return NextResponse.json(
+        { error: 'Missing required fields: title, content, and authorId are required' },
+        { status: 400 }
+      );
+    }
+
+    // Create new post
+    const newPost = await query(
+      `INSERT INTO posts (title, content, excerpt, image_url, author_id, category, tags, featured, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+       RETURNING *`,
+      [title, content, excerpt || null, imageUrl || null, authorId, category || 'General', tags || [], featured || false]
+    );
+
+    return NextResponse.json({
+      success: true,
+      message: 'Post created successfully!',
+      post: newPost.rows[0]
+    });
+
   } catch (error) {
-    return NextResponse.json({ error }, { status: 500 });
+    console.error('Create post error:', error);
+    return NextResponse.json(
+      { error: 'Failed to create post. Please try again.' },
+      { status: 500 }
+    );
   }
 }
 

@@ -48,7 +48,7 @@ export default function HeroSection() {
   }, [currentSlide]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 mt-6">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-10 -right-10 w-72 h-72 bg-blue-500 rounded-full opacity-10 animate-pulse"></div>
